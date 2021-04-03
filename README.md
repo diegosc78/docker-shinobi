@@ -24,7 +24,7 @@ This image is specifically built for ARM
 
 ## Where is the docker image
 
-ponte124/shinoby:latest-arm64v8
+[ponte124/shinoby:latest-arm64v8](https://hub.docker.com/r/ponte124/shinobi)
 
 ## What's inside
 
