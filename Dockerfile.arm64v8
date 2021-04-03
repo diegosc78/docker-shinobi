@@ -1,0 +1,100 @@
+FROM arm64v8/node:12-buster-slim
+
+ENV DB_USER=shinobi \
+    DB_PASSWORD='shinobi' \
+    DB_HOST='mariadb' \
+    DB_DATABASE='ccio' \
+    DB_PORT=3306 \
+    SUBSCRIPTION_ID=sub_XXXXXXXXXXXX \
+    PLUGIN_KEYS='{}' \
+    SSL_ENABLED='false' \
+    SSL_COUNTRY='ES' \
+    SSL_STATE='GA' \
+    SSL_LOCATION='Coruna' \
+    SSL_ORGANIZATION='Acme' \
+    SSL_ORGANIZATION_UNIT='IT Department' \
+    SSL_COMMON_NAME='myhost.mydomain.org' \
+    DB_DISABLE_INCLUDED=true
+ARG DEBIAN_FRONTEND=noninteractive
+
+# Install packages
+RUN apt update -y && apt install -y \
+        wget curl net-tools \
+        default-mysql-client \
+        ffmpeg \
+        git \
+        make \
+        g++ \
+        gcc \
+        pkg-config \
+        python3 \
+        wget \
+        tar \
+        sudo \
+        xz-utils \
+        software-properties-common \
+        libfreetype6-dev \
+        libgnutls28-dev \
+        libmp3lame-dev \
+        libass-dev \
+        libogg-dev \
+        libtheora-dev \
+        libvorbis-dev \
+        libvpx-dev \
+        libwebp-dev \
+        libssh2-1-dev \
+        libopus-dev \
+        librtmp-dev \
+        libx264-dev \
+        libx265-dev \
+        yasm \
+        build-essential \
+        bzip2 \
+        coreutils \
+        gnutls-bin \
+        nasm \
+        tar \
+        x264
+
+# Install MariaDB server... the debian way
+RUN if [ "$DB_DISABLE_INCLUDED" = "false" ] ; then set -ex; \
+	{ \
+		echo "mariadb-server" mysql-server/root_password password '${DB_ROOT_PASSWORD}'; \
+		echo "mariadb-server" mysql-server/root_password_again password '${DB_ROOT_PASSWORD}'; \
+	} | debconf-set-selections; \
+	apt-get update; \
+	apt-get install -y \
+		"mariadb-server" \
+        socat \
+	; \
+    find /etc/mysql/ -name '*.cnf' -print0 \
+		| xargs -0 grep -lZE '^(bind-address|log)' \
+		| xargs -rt -0 sed -Ei 's/^(bind-address|log)/#&/'; fi
+RUN if [ "$DB_DISABLE_INCLUDED" = "false" ] ; then sed -ie "s/^bind-address\s*=\s*127\.0\.0\.1$/#bind-address = 0.0.0.0/" /etc/mysql/my.cnf; fi
+
+# Copy source
+RUN mkdir -p /home/Shinobi /home/Shinobi/plugins /config /var/lib/mysql
+WORKDIR /home/Shinobi
+COPY . .
+COPY ./plugins/ /home/Shinobi/plugins/
+RUN chmod -R 777 /home/Shinobi/plugins
+
+# NPM install
+RUN npm i npm@latest -g && \
+    npm install pm2 -g && \
+    npm install --unsafe-perm && \
+    npm audit fix --force
+COPY ./Docker/pm2.yml ./
+
+# Copy default configuration files
+#COPY ./config/conf.json ./config/super.json /home/Shinobi/
+RUN chmod -R +x /home/Shinobi/Docker/*.sh
+
+VOLUME ["/home/Shinobi/videos"]
+VOLUME ["/home/Shinobi/plugins"]
+VOLUME ["/config"]
+VOLUME ["/customAutoLoad"]
+VOLUME ["/var/lib/mysql"]
+EXPOSE 8080
+ENTRYPOINT ["/home/Shinobi/Docker/init.sh"]
+CMD [ "pm2-docker", "pm2.yml" ]

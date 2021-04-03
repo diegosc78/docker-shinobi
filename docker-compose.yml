@@ -1,0 +1,38 @@
+version: "3"
+services:
+  mariadb:
+    image: mariadb:10.2
+    container_name: mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: changeme
+      MYSQL_DATABASE: ccio
+      MYSQL_USER: shinobi
+      MYSQL_PASSWORD: shinobi
+    restart: on-failure
+    volumes:
+     - $PWD/ShinobiData/database:/var/lib/mysql
+  shinobi:
+    #image: shinobisystems/shinobi
+    image: ponte124/shinobi:latest-arm64v8
+    container_name: Shinobi
+    environment:
+      - SSL_ENABLED=false
+      - DB_USER=shinobi
+      - DB_PASSWORD=shinobi
+      - DB_HOST=mariadb
+      - DB_DATABASE=ccio
+      - DB_DISABLE_INCLUDED=true
+    volumes:
+      - $PWD/ShinobiData/config:/config
+      - $PWD/ShinobiData/customAutoLoad:/home/Shinobi/libs/customAutoLoad
+      - $PWD/ShinobiData/videos:/home/Shinobi/videos
+      - $PWD/ShinobiData/plugins:/home/Shinobi/plugins
+      - /dev/shm/Shinobi/streams:/dev/shm/streams
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - 8080:8080
+    restart: unless-stopped
+    depends_on:
+      - mariadb
+    links:
+      - mariadb      
