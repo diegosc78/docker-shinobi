@@ -1,5 +1,5 @@
 NS ?= ponte124
-VERSION ?= latest-arm64v8
+VERSION ?= arm64v8-v22.9.2
 IMAGE_NAME ?= shinobi
 CONTAINER_NAME ?= shinobi
 CONTAINER_INSTANCE ?= manual
