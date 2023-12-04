@@ -12,8 +12,7 @@ services:
     volumes:
      - $PWD/ShinobiData/database:/var/lib/mysql
   shinobi:
-    #image: shinobisystems/shinobi
-    image: ponte124/shinobi:latest-arm64v8
+    image: docker.io/ponte124/shinobi:latest
     container_name: Shinobi
     environment:
       - SSL_ENABLED=false

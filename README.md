@@ -11,16 +11,21 @@ I hope they take my work, improve it and include it inside official repo.
 
 ## Why I built this image
 
-I want an image for ARM64 (raspberry, rock64) and official images aren't.
+I want an image for my home kubernetes cluster (mix of raspberry, rock64, celeron)
+- multiarch (at least arm64, x86)
+- with few layers
+- slim, or, at least, not so big
+- with no database server included (I have my own separated mariadb server)
+- a bit less unsecure (without a bunch of libs and shell tools included)
 
 ## Warning and disclaimer
 
-- This is not a small image. It's built with same procedure as official (which isn't following best practices).
+- This is not a optimum image.
 - This is provided with no warranty at all.
 
 ## Supported architectures
 
-This image is specifically built for ARM
+ARM64, X86
 
 ## Where is the docker image
 
@@ -28,7 +33,7 @@ This image is specifically built for ARM
 
 ## What's inside
 
-- A lot of system packages
+- Some system packages
 - MySQL client
 - Shinobi app (nodejs), exposing port 8080
 
@@ -68,6 +73,4 @@ First clone this repo. Here there's an old-style simple Makefile:
 
 I'll do it when I have some time... but if you have time... help is welcome
 
-- Transform in multi-stage Dockerfile, removing in final image unnecesary packages
-- Multi-arch support
-- Use included DB as an BUILD ARG
+- Non-root user
