@@ -1,6 +1,6 @@
-# Docker - Shinobi - arm64
+# Docker - Shinobi
 
-Docker image of Shinobi Video form ARM64
+Docker image of Shinobi Video
 
 ## References
 
