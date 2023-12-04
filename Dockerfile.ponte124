@@ -1,16 +1,8 @@
-ARG BASE_IMAGE=node:18-bullseye-slim \
-    DEBIAN_FRONTEND=noninteractive \
+ARG DEBIAN_FRONTEND=noninteractive \
     EXCLUDE_DB=true
 
-## BASE IMAGE, only with required libs
-FROM ${BASE_IMAGE} as baseruntime
-
-RUN apt-get update -y && \
-    apt-get install -y curl python3 tar bzip2 xz-utils coreutils procps gnutls-bin \
-                    x264 ffmpeg mariadb-client
-
 ## BUILD IMAGE, mostly keeping the original Dockerfile
-FROM baseruntime as build
+FROM node:18-bullseye-slim as build
 
 ENV DB_USER=shinobi \
     DB_PASSWORD='shinobi' \
@@ -29,8 +21,12 @@ ENV DB_USER=shinobi \
     SSL_COMMON_NAME='cctv.ponte.me' \
     DB_DISABLE_INCLUDED=$EXCLUDE_DB
 
-RUN apt-get update -y && apt-get upgrade -y && \
-    apt-get install -y wget curl net-tools \
+RUN echo "Installing build packages..." && \ 
+    apt-get update -y && apt-get upgrade -y && \
+    apt-get install -y curl python3 tar bzip2 xz-utils \
+        coreutils procps gnutls-bin \
+        x264 ffmpeg mariadb-client \
+        wget curl net-tools \
         software-properties-common build-essential git \
         python3 \
         sudo \
@@ -40,14 +36,28 @@ RUN apt-get update -y && apt-get upgrade -y && \
         coreutils \
         procps \
         gnutls-bin \
-        make g++ gcc
+        make g++ gcc \
+        libfreetype6-dev \
+        libgnutls28-dev \
+        libmp3lame-dev \
+        libass-dev \
+        libogg-dev \
+        libtheora-dev \
+        libvorbis-dev \
+        libvpx-dev \
+        libwebp-dev \
+        libssh2-1-dev \
+        libopus-dev \
+        librtmp-dev \
+        libx264-dev \
+        libx265-dev \
+        x264 ffmpeg \
+        ca-certificates gnupg
 
 WORKDIR /home/Shinobi
 COPY . ./
 
-RUN sh /home/Shinobi/Docker/install_ffmpeg.sh && \
-    sh /home/Shinobi/Docker/install_mariadb.sh && \
-    sh /home/Shinobi/Docker/install_nodejs.sh && \
+RUN echo "Setting some folder permissions..." && \ 
     chmod 700 /home/Shinobi && \
     chmod -R 700 /home/Shinobi/plugins && \
     chmod -f +x /home/Shinobi/Docker/init.sh && \
@@ -55,15 +65,18 @@ RUN sh /home/Shinobi/Docker/install_ffmpeg.sh && \
     echo " - Node:   " && node -v && \
     echo " - NPM:    " && npm -v && \
     echo " - ffmpeg: " && ffmpeg -version && \
-    npm i npm@latest pm2 pg -g --save && \
-    npm install --unsafe-perm && \ 
-    sed -i -e 's/\r//g' /home/Shinobi/Docker/init.sh && \
-    apt-get update -y --fix-missing && apt-get upgrade -y
+    echo "Cleaning NPM cache..." && \ 
+    npm cache clean -f && \
+    echo "Installing dependencies..." && \ 
+    npm i npm@latest pm2 pg -g --save --maxsockets 1 && \
+    npm install --unsafe-perm --maxsockets 1 && \ 
+    echo "And some final tweaks..." && \ 
+    sed -i -e 's/\r//g' /home/Shinobi/Docker/init.sh
 
 ## FINAL IMAGE FROM HERE
 ##    todo: 
 ##      - USER non root
-FROM baseruntime as finalimage
+FROM node:18-bullseye-slim as finalimage
 
 ENV DB_USER=shinobi \
     DB_PASSWORD='shinobi' \
@@ -82,13 +95,22 @@ ENV DB_USER=shinobi \
     SSL_COMMON_NAME='cctv.ponte.me' \
     DB_DISABLE_INCLUDED=$EXCLUDE_DB
 
+RUN echo "Installing runtime packages..." && \
+    apt-get update -y && \
+    apt-get install -y curl python3 tar bzip2 xz-utils coreutils procps gnutls-bin \
+                    x264 ffmpeg mariadb-client
+
 COPY --from=build /home/Shinobi /home/Shinobi
 
 RUN echo "Runtime info:" && \ 
     echo " - Node   :" && node -v && \
     echo " - NPM    :" && npm -v && \
     echo " - ffmpeg :" && ffmpeg -version && \
-    npm i npm@latest pm2 pg -g --save && \
+    echo "Cleaning NPM cache..." && \ 
+    npm cache clean -f && \
+    echo "Installing pm2..." && \ 
+    npm i npm@latest pm2 pg -g --save --maxsockets 1 && \
+    echo "Cleaning..." && \ 
     rm -f /home/Shinobi/Dockerfile* && rm -f /home/Shinobi/*.md && \
     rm -rf /var/lib/{apt,dpkg,cache,log}/ && apt remove apt --autoremove -y --allow-remove-essential
 
