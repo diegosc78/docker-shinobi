@@ -52,7 +52,11 @@ RUN echo "Installing build packages..." && \
         libx264-dev \
         libx265-dev \
         x264 ffmpeg \
-        ca-certificates gnupg
+        ca-certificates gnupg && \
+    echo "Cleaning NPM cache..." && \ 
+    npm cache clean -f && \
+    echo "Installing node global dependencies..." && \ 
+    npm i npm@latest pm2 pg -g --maxsockets 1 
 
 WORKDIR /home/Shinobi
 COPY . ./
@@ -65,10 +69,6 @@ RUN echo "Setting some folder permissions..." && \
     echo " - Node:   " && node -v && \
     echo " - NPM:    " && npm -v && \
     echo " - ffmpeg: " && ffmpeg -version && \
-    echo "Cleaning NPM cache..." && \ 
-    npm cache clean -f && \
-    echo "Installing dependencies..." && \ 
-    npm i npm@latest pm2 pg -g --save --maxsockets 1 && \
     npm install --unsafe-perm --maxsockets 1 && \ 
     echo "And some final tweaks..." && \ 
     sed -i -e 's/\r//g' /home/Shinobi/Docker/init.sh
@@ -98,7 +98,11 @@ ENV DB_USER=shinobi \
 RUN echo "Installing runtime packages..." && \
     apt-get update -y && \
     apt-get install -y curl python3 tar bzip2 xz-utils coreutils procps gnutls-bin \
-                    x264 ffmpeg mariadb-client
+                    x264 ffmpeg mariadb-client && \
+    echo "Cleaning NPM cache..." && \ 
+    npm cache clean -f && \
+    echo "Installing node global dependencies..." && \ 
+    npm i npm@latest pm2 pg -g --maxsockets 1
 
 COPY --from=build /home/Shinobi /home/Shinobi
 
@@ -106,10 +110,6 @@ RUN echo "Runtime info:" && \
     echo " - Node   :" && node -v && \
     echo " - NPM    :" && npm -v && \
     echo " - ffmpeg :" && ffmpeg -version && \
-    echo "Cleaning NPM cache..." && \ 
-    npm cache clean -f && \
-    echo "Installing pm2..." && \ 
-    npm i npm@latest pm2 pg -g --save --maxsockets 1 && \
     echo "Cleaning..." && \ 
     rm -f /home/Shinobi/Dockerfile* && rm -f /home/Shinobi/*.md && \
     rm -rf /var/lib/{apt,dpkg,cache,log}/ && apt remove apt --autoremove -y --allow-remove-essential
