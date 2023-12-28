@@ -106,6 +106,11 @@ RUN echo "Installing runtime packages..." && \
 
 COPY --from=build /home/Shinobi /home/Shinobi
 
+RUN echo "Fixing config files permissions for non-root user (allow write conf.json, see init.sh)..." && \
+    chown 1000:1000 /home/Shinobi
+#    chown 1000:1000 /home/Shinobi/conf.json /home/Shinobi/super.json && \
+#    chmod ug+w /home/Shinobi/conf.json /home/Shinobi/super.json
+
 RUN echo "Runtime info:" && \ 
     echo " - Node   :" && node -v && \
     echo " - NPM    :" && npm -v && \
@@ -115,6 +120,7 @@ RUN echo "Runtime info:" && \
     rm -rf /var/lib/{apt,dpkg,cache,log}/ && apt remove apt --autoremove -y --allow-remove-essential
 
 WORKDIR /home/Shinobi
+USER 1000
 
 VOLUME ["/home/Shinobi/videos"]
 VOLUME ["/home/Shinobi/plugins"]
