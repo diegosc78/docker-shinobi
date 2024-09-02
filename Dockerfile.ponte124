@@ -2,7 +2,7 @@ ARG DEBIAN_FRONTEND=noninteractive \
     EXCLUDE_DB=true
 
 ## BUILD IMAGE, mostly keeping the original Dockerfile
-FROM node:18-bullseye-slim as build
+FROM node:22.7.0-bullseye-slim AS build
 
 ENV DB_USER=shinobi \
     DB_PASSWORD='shinobi' \
@@ -70,13 +70,14 @@ RUN echo "Setting some folder permissions..." && \
     echo " - NPM:    " && npm -v && \
     echo " - ffmpeg: " && ffmpeg -version && \
     npm install --unsafe-perm --maxsockets 1 && \ 
+    npm install mqtt@4.2.8 && \ 
     echo "And some final tweaks..." && \ 
     sed -i -e 's/\r//g' /home/Shinobi/Docker/init.sh
 
 ## FINAL IMAGE FROM HERE
 ##    todo: 
 ##      - USER non root
-FROM node:18-bullseye-slim as finalimage
+FROM node:22.7.0-bullseye-slim AS finalimage
 
 ENV DB_USER=shinobi \
     DB_PASSWORD='shinobi' \
@@ -97,7 +98,7 @@ ENV DB_USER=shinobi \
 
 RUN echo "Installing runtime packages..." && \
     apt-get update -y && \
-    apt-get install -y curl python3 tar bzip2 xz-utils coreutils procps gnutls-bin \
+    apt-get install -y ca-certificates curl python3 tar bzip2 xz-utils coreutils procps gnutls-bin \
                     x264 ffmpeg mariadb-client && \
     echo "Cleaning NPM cache..." && \ 
     npm cache clean -f && \
