@@ -9,13 +9,14 @@ Docker image of Shinobi Video
 
 I hope they take my work, improve it and include it inside official repo.
 
-## Why I built this image
+## Features. Why I built this image
 
 I want an image for my home kubernetes cluster (mix of raspberry, rock64, celeron)
 - multiarch (at least arm64, x86)
 - with few layers
+- newer node (24) and OS (trixie) version (less vulnerabilities, more fixes, better performance)
 - slim, or, at least, not so big
-- with no database server included (I have my own separated mariadb server)
+- with no database server included (a bit more lightweight and clean, you can have your own separated mariadb server)
 - a bit less unsecure (without a bunch of libs and shell tools included)
 
 ## Warning and disclaimer
@@ -52,10 +53,10 @@ ARM64, X86
 
 - **Docker command line:** 
     - First of all you'll need:
-        - Mariadb (contairner or native, as you prefer)
+        - Mariadb (container or native, as you prefer)
         - Configure some environment variables (look at docker-compose.yml here or <https://gitlab.com/Shinobi-Systems/Shinobi/-/tree/master/Docker#environment-variables>)
 
-    `# docker run -it --rm --name shinobi --link <mariadb-container> -e <ENV>=<VALUE> ponte124/docker-shinobi:latest-arm64v8`
+    `# docker run -it --rm --name shinobi --link <mariadb-container> -e <ENV>=<VALUE> ponte124/docker-shinobi:latest`
 
 ## Building or customizing the image
 

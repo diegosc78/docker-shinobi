@@ -1,1 +1,5 @@
 # Docker ignore file
+.git
+.gitignore
+.gitlab/
+INSTALL/

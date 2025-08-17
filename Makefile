@@ -1,7 +1,7 @@
 GITREPO ?= https://gitlab.com/Shinobi-Systems/Shinobi.git
 GITBRANCH ?= master
 NS ?= docker.io/ponte124
-VERSION ?= 24.9.2
+VERSION ?= 25.8.16
 IMAGE_NAME ?= shinobi
 
 common:

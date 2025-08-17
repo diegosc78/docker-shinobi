@@ -2,7 +2,7 @@ ARG DEBIAN_FRONTEND=noninteractive \
     EXCLUDE_DB=true
 
 ## BUILD IMAGE, mostly keeping the original Dockerfile
-FROM node:22.7.0-bullseye-slim AS build
+FROM node:24.6.0-trixie-slim AS build
 
 ENV DB_USER=shinobi \
     DB_PASSWORD='shinobi' \
@@ -25,9 +25,10 @@ RUN echo "Installing build packages..." && \
     apt-get update -y && apt-get upgrade -y && \
     apt-get install -y curl python3 tar bzip2 xz-utils \
         coreutils procps gnutls-bin \
-        x264 ffmpeg mariadb-client \
+        x264 ffmpeg \
+        mariadb-client \
         wget curl net-tools \
-        software-properties-common build-essential git \
+        build-essential git \
         python3 \
         sudo \
         pkg-config apt-utils \
@@ -51,7 +52,6 @@ RUN echo "Installing build packages..." && \
         librtmp-dev \
         libx264-dev \
         libx265-dev \
-        x264 ffmpeg \
         ca-certificates gnupg && \
     echo "Cleaning NPM cache..." && \ 
     npm cache clean -f && \
@@ -70,14 +70,14 @@ RUN echo "Setting some folder permissions..." && \
     echo " - NPM:    " && npm -v && \
     echo " - ffmpeg: " && ffmpeg -version && \
     npm install --unsafe-perm --maxsockets 1 && \ 
-    npm install mqtt@4.2.8 && \ 
+    npm install mqtt@5.14.0 && \ 
     echo "And some final tweaks..." && \ 
     sed -i -e 's/\r//g' /home/Shinobi/Docker/init.sh
 
 ## FINAL IMAGE FROM HERE
 ##    todo: 
 ##      - USER non root
-FROM node:22.7.0-bullseye-slim AS finalimage
+FROM node:24.6.0-trixie-slim AS finalimage
 
 ENV DB_USER=shinobi \
     DB_PASSWORD='shinobi' \
@@ -131,5 +131,7 @@ VOLUME ["/config"]
 EXPOSE 8080 8443
 
 ENTRYPOINT ["/home/Shinobi/Docker/init.sh"]
+
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 CMD curl --fail http://localhost:8080/ || exit 1
 
 CMD [ "pm2-docker", "/home/Shinobi/Docker/pm2.yml" ]
