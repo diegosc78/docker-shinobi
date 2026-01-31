@@ -5,7 +5,9 @@ Docker image of Shinobi Video
 ## References
 
 - Main source repo: <https://gitlab.com/Shinobi-Systems/Shinobi.git>
-- Official dockerfile: <https://gitlab.com/Shinobi-Systems/Shinobi/-/tree/master/Docker>
+- Official dockerfile: 
+    - Integrated: <https://gitlab.com/Shinobi-Systems/Shinobi/-/tree/master/Docker>
+    - "Production": <https://gitlab.com/Shinobi-Systems/ShinobiDocker/-/blob/master/Dockerfile>
 
 I hope they take my work, improve it and include it inside official repo.
 
@@ -13,11 +15,22 @@ I hope they take my work, improve it and include it inside official repo.
 
 I want an image for my home kubernetes cluster (mix of raspberry, rock64, celeron)
 - multiarch (at least arm64, x86)
-- with few layers
-- newer node (24) and OS (trixie) version (less vulnerabilities, more fixes, better performance)
+    - See Makefile ... using buildx
+- more docker friendly:
+    - with few layers, commands aggregation
+    - more docker-cache-friendly
+- newer base versions (less vulnerabilities, more fixes, better performance)
+    - Using node 25 (official still in 22)
+    - Using debian 13 (ofricial still in 12)
 - slim, or, at least, not so big
-- with no database server included (a bit more lightweight and clean, you can have your own separated mariadb server)
+    - with no database server included (a bit more lightweight and clean, you can have your own separated mariadb server)
+    - no git included (log warning, but i consider this optional)
+    - pruning some useless files for runtime
 - a bit less unsecure (without a bunch of libs and shell tools included)
+    - Using for runtime dhi (still using "-dev" variant ... because of the mess with shell scripts). A bit bigger than trixie-slim, but only about 10M
+    - no git included
+- plugin included
+    - mqtt (see init.sh)
 
 ## Warning and disclaimer
 
@@ -30,7 +43,7 @@ ARM64, X86
 
 ## Where is the docker image
 
-[ponte124/shinoby:latest-arm64v8](https://hub.docker.com/r/ponte124/shinobi)
+[ponte124/shinobi:latest](https://hub.docker.com/r/ponte124/shinobi)
 
 ## What's inside
 
@@ -62,16 +75,11 @@ ARM64, X86
 
 First clone this repo. Here there's an old-style simple Makefile:
 
-- **Build:**
-
-    `# make build`
-
-- **Push:** You'll need first to customize registry in Makefile and login your registry
-
-    `# make push`
+`# make buildx`
 
 ## To Do
 
 I'll do it when I have some time... but if you have time... help is welcome
 
-- Non-root user
+- dhi image (without "-dev" variant; fixing shell mess)
+- prune more files (eg: /home/Shinobi/INSTALL)

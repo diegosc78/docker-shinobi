@@ -1,5 +1,149 @@
-# Docker ignore file
+# ============================================================================
+# DOCKER IGNORE FILE - Exclude files from build context
+# ============================================================================
+# This file reduces build context size and prevents secrets from leaking
+# into Docker layers. Order: VCS → CI/CD → IDE → Testing → Artifacts → Env
+
+# ============================================================================
+# VERSION CONTROL & SCM
+# ============================================================================
 .git
 .gitignore
-.gitlab/
-INSTALL/
+.gitattributes
+.github
+.gitlab
+.gitlab-ci.yml
+.gitmodules
+
+# ============================================================================
+# CI/CD & BUILD AUTOMATION
+# ============================================================================
+.circleci
+azure-pipelines.yml
+Jenkinsfile
+.travis.yml
+.drone.yml
+
+# ============================================================================
+# IDE & EDITOR FILES
+# ============================================================================
+.vscode
+.idea
+.vs
+*.swp
+*.swo
+*~
+.DS_Store
+.AppleDouble
+.LSOverride
+*.sublime-project
+*.sublime-workspace
+.eclipse
+.project
+.pydevproject
+*.iml
+
+# ============================================================================
+# TESTING & COVERAGE
+# ============================================================================
+tests/
+test/
+spec/
+coverage/
+.coverage
+.nyc_output
+__pycache__/
+*.test.js
+*.test.ts
+*.spec.js
+*.spec.ts
+*.test.py
+pytest.ini
+jest.config.js
+mocha.opts
+
+# ============================================================================
+# DEPENDENCY & BUILD ARTIFACTS
+# ============================================================================
+node_modules/
+bower_components/
+dist/
+build/
+lib/
+target/
+.gradle/
+.cargo/
+venv/
+env/
+ENV/
+.tox/
+.eggs/
+*.egg-info/
+pip-log.txt
+pip-delete-this-directory.txt
+.pytest_cache/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# ============================================================================
+# ENVIRONMENT & SECRETS
+# ============================================================================
+.env
+.env.local
+.env.*.local
+.env.production.local
+*.pem
+*.key
+*.crt
+*.csr
+*.keystore
+secrets/
+config/secrets/
+
+# ============================================================================
+# LOGS & TEMPORARY FILES
+# ============================================================================
+*.log
+*.log.*
+logs/
+tmp/
+temp/
+*.tmp
+*.pid
+*.swp
+.cache
+
+# ============================================================================
+# DOCUMENTATION & MEDIA
+# ============================================================================
+.*README*.md
+CHANGELOG.md
+CONTRIBUTING.md
+LICENSE.txt
+docs/
+wiki/
+*.pdf
+*.doc
+*.docx
+*.pptx
+
+# ============================================================================
+# DEVELOPMENT FILES (Keep as commented reference)
+# ============================================================================
+# Dockerfile.* versions (kept for reference, excluded from build)
+Dockerfile.old
+Dockerfile.dev
+Dockerfile.test
+Dockerfile.ponte124
+
+# Database exports (too large for context)
+*.sql
+*.sql.gz
+database/
+
+# Large media files
+videos/
+*.mp4
+*.mkv
+*.avi
