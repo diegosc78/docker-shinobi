@@ -77,6 +77,15 @@ First clone this repo. Here there's an old-style simple Makefile:
 
 `# make buildx`
 
+## Bumping checklist
+
+- Review official dockerfiles (see links up)
+- Review latest stable mqtt npm version (https://www.npmjs.com/package/mqtt) and update Dockerfile 
+- Make download
+- Make build
+- Test in docker-compose locally
+- 
+
 ## To Do
 
 I'll do it when I have some time... but if you have time... help is welcome

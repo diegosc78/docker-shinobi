@@ -6,7 +6,7 @@
 # ============================================================================
 
 # Global build arguments
-ARG BASE_BUILDER_IMAGE=node:25-trixie-slim
+ARG BASE_BUILDER_IMAGE=mirror.gcr.io/library/node:lts-trixie-slim
 ARG BASE_RUNTIME_IMAGE=dhi.io/node:25-debian13-dev
 ARG DEBIAN_FRONTEND=noninteractive
 ARG EXCLUDE_DB=true
@@ -106,7 +106,7 @@ COPY . ./
 # Install application dependencies with BuildKit npm cache mount
 # Use npm ci for reproducible, production-ready builds
 RUN --mount=type=cache,target=/root/.npm \
-    npm install mqtt@5.14.1 && \
+    npm install mqtt@5.15.1 && \
     npm install --unsafe-perm --maxsockets 1 && \
     npm prune --omit=dev --omit=optional && \
     find node_modules -type d -name ".github" -exec rm -rf {} + 2>/dev/null || true && \

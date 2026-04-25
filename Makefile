@@ -1,7 +1,7 @@
 GITREPO ?= https://gitlab.com/Shinobi-Systems/Shinobi.git
 GITBRANCH ?= master
 NS ?= docker.io/ponte124
-VERSION ?= 26.1.31
+VERSION ?= 26.4.25
 IMAGE_NAME ?= shinobi
 
 common:
@@ -12,7 +12,7 @@ clean:
 
 download: common clean
 	git clone --branch $(GITBRANCH) $(GITREPO) ShinobiSource
-	cp ./Dockerfile.ponte124 ./ShinobiSource/
+	cp ./Dockerfile ./ShinobiSource/
 	cp ./init.sh ./ShinobiSource/Docker/
 	cp ./.dockerignore ./ShinobiSource/
 
@@ -26,3 +26,7 @@ push:
 	docker tag $(NS)/$(IMAGE_NAME):$(VERSION) $(NS)/$(IMAGE_NAME):latest
 	docker push $(NS)/$(IMAGE_NAME):$(VERSION)
 	docker push $(NS)/$(IMAGE_NAME):latest
+
+sbom:
+	mkdir -p ./ShinobiData/sbom
+	docker scout sbom --format cyclonedx --output ./ShinobiData/sbom/$(IMAGE_NAME)-$(VERSION)-scout.json $(NS)/$(IMAGE_NAME):$(VERSION)
