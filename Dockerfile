@@ -199,7 +199,8 @@ COPY --from=builder /home/Shinobi /home/Shinobi
 RUN set -ex && \
     chown -R 1000:1000 /home/Shinobi && \
     chmod 755 /home/Shinobi && \
-    chmod 755 /home/Shinobi/Docker
+    chmod 755 /home/Shinobi/Docker && \
+    ln -s /opt/nodejs/node-v25* /opt/nodejs/node25
 
 # Set working directory and switch to non-root user
 WORKDIR /home/Shinobi
@@ -227,4 +228,4 @@ HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
 
 # Set entry point and default command
 ENTRYPOINT ["/home/Shinobi/Docker/init.sh"]
-CMD ["/opt/nodejs/node-v25.5.0/bin/pm2-docker", "/home/Shinobi/Docker/pm2.yml"]
+CMD ["/opt/nodejs/node25/bin/pm2-docker", "/home/Shinobi/Docker/pm2.yml"]
